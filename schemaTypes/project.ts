@@ -11,13 +11,27 @@ export const projectSchema = defineType({
       ...createMultilangField('name', 'Название проекта', 'Название проекта на разных языках'),
       fieldset: 'content',
     },
-    
-    // Краткое описание
+
+    // Название клиента
     {
-      ...createMultilangField('shortDescription', 'Краткое описание', 'Краткое описание проекта на разных языках'),
+      ...createMultilangField(
+        'clientName',
+        'Название клиента',
+        'Название клиента на разных языках',
+      ),
       fieldset: 'content',
     },
-    
+
+    // Краткое описание
+    {
+      ...createMultilangField(
+        'shortDescription',
+        'Краткое описание',
+        'Краткое описание проекта на разных языках',
+      ),
+      fieldset: 'content',
+    },
+
     // Слаг проекта
     {
       ...defineField({
@@ -26,14 +40,18 @@ export const projectSchema = defineType({
         type: 'slug',
         description: 'URL-адрес проекта (например: my-awesome-project)',
         options: {
-          source: 'name.ru',
+          source: (doc: any) => {
+            const clientName = doc?.clientName?.uk || ''
+            const projectName = doc?.name?.uk || ''
+            return `${clientName}-${projectName}`.toLowerCase().replace(/\s+/g, '-')
+          },
           maxLength: 96,
         },
         validation: (Rule) => Rule.required(),
       }),
       fieldset: 'content',
     },
-    
+
     // Фото превью
     {
       ...defineField({
@@ -46,31 +64,16 @@ export const projectSchema = defineType({
         },
         validation: (Rule) => Rule.required(),
       }),
-      fieldset: 'content',
+      fieldset: 'portfolio',
     },
-    
-    // Фото главное мобильное
-    {
-      ...defineField({
-        name: 'mainImageMobile',
-        title: 'Фото главное (мобильное)',
-        type: 'image',
-        description: 'Главное фото проекта для мобильных устройств',
-        options: {
-          hotspot: true,
-        },
-        validation: (Rule) => Rule.required(),
-      }),
-      fieldset: 'content',
-    },
-    
-    // Фото главное для компьютера
+
+    // Фото главное
     {
       ...defineField({
         name: 'mainImageDesktop',
-        title: 'Фото главное (компьютер)',
+        title: 'Фото главное',
         type: 'image',
-        description: 'Главное фото проекта для компьютера',
+        description: 'Главное фото проекта',
         options: {
           hotspot: true,
         },
@@ -78,7 +81,7 @@ export const projectSchema = defineType({
       }),
       fieldset: 'content',
     },
-    
+
     // Категории проекта
     {
       ...defineField({
@@ -96,7 +99,7 @@ export const projectSchema = defineType({
       }),
       fieldset: 'content',
     },
-    
+
     // Тип проекта
     {
       ...defineField({
@@ -108,7 +111,7 @@ export const projectSchema = defineType({
       }),
       fieldset: 'content',
     },
-    
+
     // Блоки проекта
     {
       ...defineField({
@@ -130,11 +133,66 @@ export const projectSchema = defineType({
             title: 'Блок отзыва',
           },
         ],
-        validation: (Rule) => Rule.required().min(1).error('Добавьте хотя бы один блок'),
+        // validation: (Rule) => Rule.required().min(1).error('Добавьте хотя бы один блок'),
       }),
       fieldset: 'content',
     },
-    
+
+    // Ссылка на сайт
+    {
+      ...defineField({
+        name: 'websiteUrl',
+        title: 'Ссылка на сайт',
+        type: 'url',
+        description: 'Внешняя ссылка на сайт проекта (должна начинаться с https)',
+        validation: (Rule) =>
+          Rule.required()
+            .uri({
+              scheme: ['https'],
+            })
+            .error('Ссылка должна начинаться с https'),
+      }),
+      fieldset: 'content',
+    },
+
+    // Преимущества
+    {
+      ...defineField({
+        name: 'advantages',
+        title: 'Преимущества',
+        type: 'array',
+        description: 'Список преимуществ проекта',
+        of: [
+          {
+            type: 'string',
+            title: 'Преимущество',
+          },
+        ],
+        validation: (Rule) => Rule.required().min(1).error('Добавьте хотя бы одно преимущество'),
+      }),
+      fieldset: 'portfolio',
+    },
+
+    // Заголовок для секции портфолио
+    {
+      ...createMultilangField(
+        'portfolioTitle',
+        'Заголовок',
+        'Заголовок для секции портфолио на главной странице',
+      ),
+      fieldset: 'portfolio',
+    },
+
+    // Описание для секции портфолио
+    {
+      ...createMultilangField(
+        'portfolioDescription',
+        'Описание',
+        'Описание для секции портфолио на главной странице',
+      ),
+      fieldset: 'portfolio',
+    },
+
     // Порядок проекта
     {
       ...defineField({
@@ -146,36 +204,35 @@ export const projectSchema = defineType({
       }),
       fieldset: 'settings',
     },
-    
   ],
-  
+
   // Предварительный просмотр в списке
   preview: {
     select: {
       title: 'name.ru',
-      subtitle: 'shortDescription.ru',
+      subtitle: 'clientName.ru',
       media: 'previewImage',
-      categories: 'categories[].name.ru',
-      type: 'type.name.ru',
     },
     prepare(selection) {
-      const {title, subtitle, media, categories, type} = selection
-      const categoriesText = categories && categories.length > 0 
-        ? categories.join(', ') 
-        : 'Без категорий'
+      const {title, subtitle, media} = selection
       return {
         title: title || 'Без названия',
-        subtitle: `${categoriesText} • ${type || 'Без типа'} • ${subtitle || 'Без описания'}`,
+        subtitle: subtitle || 'Без клиента',
         media: media,
       }
     },
   },
-  
+
   // Группировка полей в админке
   fieldsets: [
     {
       name: 'content',
       title: 'Основной контент',
+      options: {collapsible: true, collapsed: false},
+    },
+    {
+      name: 'portfolio',
+      title: 'Секция портфолио на главной странице',
       options: {collapsible: true, collapsed: false},
     },
     {
@@ -185,4 +242,3 @@ export const projectSchema = defineType({
     },
   ],
 })
-
