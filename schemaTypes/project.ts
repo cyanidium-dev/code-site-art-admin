@@ -193,6 +193,37 @@ export const projectSchema = defineType({
       fieldset: 'portfolio',
     },
 
+    // Начальный цвет градиента
+    {
+      ...defineField({
+        name: 'gradientStartColor',
+        title: 'Начальный цвет градиента',
+        type: 'color',
+        description: 'Начальный цвет градиента фона секции портфолио',
+        options: {
+          disableAlpha: true,
+        },
+        validation: (Rule) =>
+          Rule.required().error('Обязательно выберите начальный цвет градиента'),
+      }),
+      fieldset: 'portfolio',
+    },
+
+    // Конечный цвет градиента
+    {
+      ...defineField({
+        name: 'gradientEndColor',
+        title: 'Конечный цвет градиента',
+        type: 'color',
+        description: 'Конечный цвет градиента фона секции портфолио',
+        options: {
+          disableAlpha: true,
+        },
+        validation: (Rule) => Rule.required().error('Обязательно выберите конечный цвет градиента'),
+      }),
+      fieldset: 'portfolio',
+    },
+
     // Порядок проекта
     {
       ...defineField({
