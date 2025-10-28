@@ -8,17 +8,20 @@ export const projectTypeSchema = defineType({
   fields: [
     // Название типа
     createMultilangField('name', 'Название типа', 'Название типа проекта на разных языках'),
-    
+
     // Иконка типа
     defineField({
       name: 'icon',
       title: 'Иконка',
-      type: 'string',
-      description: 'Название иконки (например: web, mobile, design)',
-      validation: (Rule) => Rule.required(),
+      type: 'image',
+      description: 'SVG иконка для типа проекта',
+      options: {
+        accept: '.svg',
+      },
+      validation: (Rule) => Rule.required().error('Обязательно загрузите SVG иконку'),
     }),
   ],
-  
+
   // Предварительный просмотр в списке
   preview: {
     select: {
