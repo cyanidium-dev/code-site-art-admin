@@ -47,6 +47,29 @@ export const createMultilangTextField = (name: string, title: string, descriptio
   })
 }
 
+// Функция для создания мультиязычного поля с массивом строк
+export const createMultilangArrayField = (name: string, title: string, description?: string) => {
+  return defineField({
+    name,
+    title,
+    description,
+    type: 'object',
+    fields: SUPPORTED_LANGUAGES.map((lang) => ({
+      name: lang.id,
+      title: `[${lang.id.toUpperCase()}] ${lang.title}`,
+      type: 'array',
+      of: [{type: 'string'}],
+      validation: (Rule: any) =>
+        Rule.required().min(1).error(`Добавьте хотя бы один элемент для "${lang.title}"`),
+    })),
+    validation: (Rule: any) => Rule.required().error('Необходимо заполнить хотя бы один язык'),
+    options: {
+      collapsible: true,
+      collapsed: false,
+    },
+  })
+}
+
 // Функция для создания мультиязычного поля с богатым контентом (Portable Text + изображения)
 export const createMultilangRichContentField = (
   name: string,
