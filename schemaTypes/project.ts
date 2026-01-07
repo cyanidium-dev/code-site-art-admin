@@ -1,5 +1,5 @@
 import {defineType, defineField} from 'sanity'
-import {createMultilangField} from '../components/MultilangField'
+import {createMultilangField, createMultilangArrayField} from '../components/MultilangField'
 
 export const projectSchema = defineType({
   name: 'project',
@@ -157,19 +157,11 @@ export const projectSchema = defineType({
 
     // Преимущества
     {
-      ...defineField({
-        name: 'advantages',
-        title: 'Преимущества',
-        type: 'array',
-        description: 'Список преимуществ проекта',
-        of: [
-          {
-            type: 'string',
-            title: 'Преимущество',
-          },
-        ],
-        validation: (Rule) => Rule.required().min(1).error('Добавьте хотя бы одно преимущество'),
-      }),
+      ...createMultilangArrayField(
+        'advantages',
+        'Преимущества',
+        'Список преимуществ проекта на разных языках',
+      ),
       fieldset: 'portfolio',
     },
 
