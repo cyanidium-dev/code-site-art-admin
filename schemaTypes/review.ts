@@ -29,7 +29,7 @@ export const reviewSchema = defineType({
       fieldset: 'content',
     },
     
-    // Тип контента - переключатель между видео и текстом
+    // Тип контента - переключатель между видео, текстом и изображением
     {
       ...defineField({
         name: 'contentType',
@@ -39,6 +39,7 @@ export const reviewSchema = defineType({
           list: [
             {title: 'Видео', value: 'video'},
             {title: 'Текст', value: 'text'},
+            {title: 'Изображение', value: 'image'},
           ],
           layout: 'radio',
         },
@@ -67,6 +68,28 @@ export const reviewSchema = defineType({
       fieldset: 'content',
     },
     
+    // Изображение отзыва (показывается только если выбран тип "изображение")
+    {
+      ...defineField({
+        name: 'reviewImage',
+        title: 'Изображение отзыва',
+        type: 'image',
+        description: 'Фото отзыва',
+        options: {
+          hotspot: true,
+        },
+        hidden: ({document}) => document?.contentType !== 'image',
+        validation: (Rule) => Rule.custom((value, context) => {
+          const contentType = context.document?.contentType
+          if (contentType === 'image' && !value) {
+            return 'Изображение обязательно при выборе типа "Изображение"'
+          }
+          return true
+        }),
+      }),
+      fieldset: 'content',
+    },
+    
     // Текст отзыва (показывается только если выбран тип "текст")
     {
       ...createMultilangTextField('reviewText', 'Текст отзыва', 'Текст отзыва на разных языках'),
@@ -74,7 +97,7 @@ export const reviewSchema = defineType({
       hidden: ({document}) => document?.contentType !== 'text',
       validation: (Rule) => Rule.custom((value, context) => {
         const contentType = context.document?.contentType
-        if (contentType === 'text' && (!value || !value.ru)) {
+        if (contentType === 'text' && (!value || !(value as any)?.ru)) {
           return 'Текст отзыва обязателен при выборе типа "Текст"'
         }
         return true
@@ -148,11 +171,12 @@ export const reviewSchema = defineType({
     },
     prepare(selection) {
       const {title, subtitle, projectLink, status} = selection
-      const statusEmoji = {
+      const statusEmojiMap: Record<string, string> = {
         published: '[OK]',
         draft: '[DRAFT]',
         archived: '[ARCHIVE]',
-      }[status] || '[DRAFT]'
+      }
+      const statusEmoji = statusEmojiMap[status as string] || '[DRAFT]'
       
       return {
         title: title || 'Без имени',
