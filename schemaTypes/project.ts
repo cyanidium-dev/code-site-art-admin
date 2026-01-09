@@ -201,6 +201,46 @@ export const projectSchema = defineType({
       fieldset: 'portfolio',
     },
 
+    // Цвет кнопки
+    {
+      ...defineField({
+        name: 'buttonColor',
+        title: 'Цвет кнопки',
+        type: 'string',
+        description: 'Цвет кнопки в карточке проекта',
+        options: {
+          list: [
+            {title: 'Белый', value: 'white'},
+            {title: 'Черный', value: 'black'},
+          ],
+          layout: 'radio',
+        },
+        initialValue: 'white',
+        validation: (Rule) => Rule.required(),
+      }),
+      fieldset: 'portfolio',
+    },
+
+    // Цвет текста
+    {
+      ...defineField({
+        name: 'textColor',
+        title: 'Цвет текста',
+        type: 'string',
+        description: 'Цвет текста в карточке проекта',
+        options: {
+          list: [
+            {title: 'Белый', value: 'white'},
+            {title: 'Черный', value: 'black'},
+          ],
+          layout: 'radio',
+        },
+        initialValue: 'white',
+        validation: (Rule) => Rule.required(),
+      }),
+      fieldset: 'portfolio',
+    },
+
     // Порядок проекта
     {
       ...defineField({
