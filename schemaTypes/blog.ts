@@ -39,6 +39,30 @@ export const blogSchema = defineType({
       fieldset: 'content',
     },
 
+    // Автор статьи (для JSON-LD)
+    {
+      ...defineField({
+        name: 'author',
+        title: 'Автор статьи',
+        type: 'string',
+        description: 'Имя автора статьи (используется в JSON-LD)',
+        validation: (Rule) => Rule.required().error('Укажите автора статьи'),
+      }),
+      fieldset: 'content',
+    },
+
+    // Дата первой публикации (для JSON-LD)
+    {
+      ...defineField({
+        name: 'datePublished',
+        title: 'Дата публикации',
+        type: 'datetime',
+        description: 'Дата первой публикации статьи (используется в JSON-LD)',
+        validation: (Rule) => Rule.required().error('Укажите дату публикации'),
+      }),
+      fieldset: 'content',
+    },
+
     // Фото превью
     {
       ...defineField({
